@@ -3,8 +3,8 @@
 # Script: susfs_deinlined.sh
 # Description: Converts official SUSFS inline-hook patch to a de-inlined version
 # Author: midori01 <lv@lvlv.lv>, Gemini
-# Updated: 2026-09-10
-# Version: 2.0.0
+# Updated: 2026-09-13
+# Version: 2.0.1
 # ==============================================================================
 
 set -e
@@ -99,32 +99,6 @@ def is_ksu_susfs_ifndef(line):
         line
     ))
 
-def process_input_c(body):
-    result = []
-    i = 0
-    replaced = False
-    while i < len(body):
-        line = body[i]
-        clean_line = strip_comment(line)
-        if is_ksu_susfs_if(clean_line):
-            depth = 1
-            j = i + 1
-            while j < len(body) and depth > 0:
-                cur = body[j]
-                if is_if(cur):
-                    depth += 1
-                elif is_endif(cur):
-                    depth -= 1
-                j += 1
-            if not replaced:
-                result.append("+extern struct static_key_false ksu_input_hook_key_false;")
-                result.append("+")
-                replaced = True
-            i = j
-            continue
-        result.append(line)
-        i += 1
-    return remove_duplicate_plus_empty(result)
 
 def process_normal_file(body, target):
     result = []
@@ -308,10 +282,7 @@ def process_patch(patch):
     if not body:
         return None
 
-    if target == "drivers/input/input.c":
-        new_body = process_input_c(body)
-    else:
-        new_body = process_normal_file(body, target)
+    new_body = process_normal_file(body, target)
 
     new_body = clean_body(new_body)
 
