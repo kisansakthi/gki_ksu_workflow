@@ -156,13 +156,11 @@ permissions:
   packages: write
 
 jobs:
-  fetch:
-    uses: ./.github/workflows/update.yml
-    with:
-      kernel_version: ${{ inputs.kernel_version }}
+  # 'fetch' (update.yml) removed: it rewrites kernel_versions.json on every run,
+  # which reverts our pin to android14-6.1-2026-03_r9 (commit 65896c4edca1).
+  # It was a sequencing dependency only - setup consumed none of its outputs.
 
   setup:
-    needs: fetch
     runs-on: ubuntu-latest
     outputs:
       release_tag: ${{ steps.config.outputs.release_tag }}
