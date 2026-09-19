@@ -179,7 +179,8 @@ jobs:
       - name: Download Toolchains & Kernel Source
         run: |
           mkdir -p kernel_workspace && cd kernel_workspace
-          RELEASE_MIRROR="https://github.com/${{ github.repository }}/releases/download/${{ steps.cfg.outputs.mirror_tag }}"
+          # Forks do not inherit releases, so pull toolchain/source mirrors from upstream.
+          RELEASE_MIRROR="https://github.com/reF1nd/gki_ksu_workflow/releases/download/${{ steps.cfg.outputs.mirror_tag }}"
           CLANG_TAR="clang-${{ steps.cfg.outputs.clang_version }}.tar.gz"
           case "${{ steps.cfg.outputs.asb_date }}" in
             lts)
