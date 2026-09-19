@@ -225,6 +225,11 @@ jobs:
           rm -f common/android/abi_gki_protected_exports_* || true
           [[ "${{ inputs.kernel_version }}" == "6.6" ]] && echo "device_find_any_child" >> common/android/abi_gki_aarch64_xiaomi || true
           sed -i 's/ -dirty//g' common/scripts/setlocalversion || true
+          # Hard-silence setlocalversion: the kernel tree lives inside the workflow's
+          # own git checkout, so scm detection would stamp the workflow's commit hash
+          # into UTS_RELEASE and break vermagic. CONFIG_LOCALVERSION supplies the name.
+          printf '#!/bin/sh\nexit 0\n' > common/scripts/setlocalversion
+          chmod +x common/scripts/setlocalversion
           sed -i ':a; /#ifdef USE_PKCS11_ENGINE/{N;N;s/#ifdef USE_PKCS11_ENGINE\n\(.*\)\n#endif/\1/; ta}' common/certs/extract-cert.c || true
 
       - name: Apply LZ4 1.10.0 and Zstd 1.5.7

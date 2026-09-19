@@ -64,6 +64,11 @@ runs:
         
         sed -i '/CONFIG_LOCALVERSION/d' $DEFCONFIG
         echo "CONFIG_LOCALVERSION=\"${{ inputs.localversion }}\"" >> $DEFCONFIG
+        # The sed above also strips CONFIG_LOCALVERSION_AUTO. Without it explicitly
+        # disabled, scripts/setlocalversion finds the ENCLOSING workflow checkout's
+        # .git (the kernel tree extracts inside it) and appends -g<workflow hash>,
+        # corrupting the vermagic so vendor modules are rejected.
+        echo "# CONFIG_LOCALVERSION_AUTO is not set" >> $DEFCONFIG
         
         cat >> $DEFCONFIG <<-'EOF'
         CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y
